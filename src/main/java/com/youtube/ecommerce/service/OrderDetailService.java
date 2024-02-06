@@ -5,9 +5,11 @@ import com.youtube.ecommerce.dao.OrderDetailDao;
 import com.youtube.ecommerce.dao.ProductDao;
 import com.youtube.ecommerce.dao.UserDao;
 import com.youtube.ecommerce.entity.*;
+import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,6 +25,21 @@ public class OrderDetailService {
 
    @Autowired
    private UserDao userDao;
+
+   public List<OrderDetail> getAllOrderDetails(){
+       List<OrderDetail> orderDetails= new ArrayList<>();
+       orderDetailDao.findAll().forEach(
+
+               x -> orderDetails.add(x)
+       );
+       return orderDetails;
+   }
+
+   public List<OrderDetail> getOrderDetails(){
+      String currentUser =  JwtRequestFilter.CURRENT_USER;
+      User user = userDao.findById(currentUser).get();
+     return orderDetailDao.findByUser(user);
+   }
 
     public void placeOrder(OrderInput orderInput){
         List<OrderProductQuantity> productQuantityList = orderInput.getOrderProductQuantityList();
@@ -49,6 +66,15 @@ public class OrderDetailService {
             orderDetailDao.save(orderDetail);
 
         }
+    }
+
+
+    public void markOrderAsDelivered(Integer orderId){
+       OrderDetail orderDetail= orderDetailDao.findById(orderId).get();
+       if(orderDetail != null){
+           orderDetail.setOrderStatus("Delivered");
+           orderDetailDao.save(orderDetail);
+       }
     }
 
 
