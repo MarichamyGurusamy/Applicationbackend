@@ -1,14 +1,12 @@
-# Use official OpenJDK 21 runtime image
+# === STAGE 1: Build the JAR ===
+FROM maven:3.9.5-eclipse-temurin-21 AS builder
+WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
+
+# === STAGE 2: Run the app ===
 FROM openjdk:21-jdk
-
-# Create a temp volume (optional)
-VOLUME /tmp
-
-# Copy the built jar into the container
-COPY target/yourapp.jar app.jar
-
-# Expose the port your app listens on (adjust if needed, default Spring Boot is 8080)
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
-
-# Run the jar file
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
