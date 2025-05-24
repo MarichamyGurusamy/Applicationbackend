@@ -1,5 +1,5 @@
 # Use official OpenJDK 21 runtime image
-FROM openjdk:21-jdk-alpine
+FROM openjdk:21-jdk
 
 # Create a temp volume (optional)
 VOLUME /tmp
